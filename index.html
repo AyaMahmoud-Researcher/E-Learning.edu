@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Aya Mahmoud Platform</title>
+  <style>
+    :root{--accent:#2563eb;--muted:#666;--bg:#f6f8fb}
+    body{font-family: Tahoma, Arial, sans-serif;margin:0;padding:0;background:var(--bg);color:#111; -webkit-text-size-adjust: 100%;}
+    header{background:linear-gradient(90deg,#083e8a,#2563eb);color:white;padding:18px}
+    .container{max-width:1100px;margin:20px auto;padding:16px}
+    .card{background:white;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.06);padding:16px;margin-bottom:16px}
+    .row{display:flex;gap:20px;align-items:flex-start}
+    @media (max-width: 850px) { .row { flex-direction: column; align-items: stretch; } }
+    .btn{background:var(--accent);color:white;padding:12px 15px;border-radius:8px;border:none;cursor:pointer;font-weight:bold; transition: 0.3s;}
+    .btn.secondary{background:#f3f4f6;color:#111}
+    .btn.danger{background:#dc2626;color:white}
+    .btn.edit-btn{background:#f59e0b;color:white; margin-top:5px;}
+    .btn.link-btn{background:#7c3aed;margin-top:10px;display:inline-block;text-decoration:none;font-size:14px;color:white; border-radius: 5px; padding: 10px; text-align: center;}
+    input,textarea{padding:12px;border-radius:6px;border:1px solid #ddd;width:100%;box-sizing:border-box;margin-top:5px; font-size: 16px;}
+    label{font-size: 13px; font-weight: bold; display: block; margin-top: 10px;}
+    .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+    .lesson{padding:15px;border-radius:10px;border:1px solid #e6eefc;background:#fff; display: flex; flex-direction: column;}
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 8px; margin-bottom: 10px; }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+    .chat{border:1px solid #e6eefc;padding:8px;border-radius:8px;height:300px;overflow:auto;background:#fff; display: flex; flex-direction: column;}
+    .message{margin:8px 0;padding:10px;border-radius:12px; font-size: 14px; line-height: 1.5; max-width: 85%;}
+    .from-user{background:#e6f0ff; align-self: flex-start; text-align: right;}
+    .from-bot{background:#f1f5f9; align-self: flex-end; text-align: right;}
+    .hidden{display:none !important}
+    footer { padding: 30px; text-align: center; color: var(--muted); font-size: 14px; border-top: 1px solid #e0e0e0; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div style="font-size:20px;font-weight:700">Aya Mahmoud — Master Degree Researcher in Educational Technology</div>
+    <div style="font-size:12px;opacity:0.9">بيئة تعلم إلكترونى قائمة على تطبيقات الذكاء الاصطناعى لتنمية العمق المعرفى و الشغف الاكاديمى</div>
+  </div>
+</header>
+
+<div class="container">
+  <div id="loginCard" class="card" style="max-width:400px; margin: 40px auto; text-align: center;">
+    <h3>تسجيل الدخول للمنصة</h3>
+    <label>اسم المستخدم</label>
+    <input id="username" placeholder="teacher أو student" />
+    <label>كلمة المرور</label>
+    <input id="password" type="password" placeholder="كلمة المرور" />
+    <button class="btn" id="loginBtn" style="width:100%; margin-top:15px">دخول</button>
+  </div>
+
+  <div id="mainApp" class="hidden">
+    <div class="card" style="display:flex; justify-content:space-between; align-items:center">
+      <h3 id="welcomeTitle" style="margin:0">مرحباً بك</h3>
+      <button class="btn secondary" id="logoutBtn">خروج</button>
+    </div>
+
+    <div class="row">
+      <div style="flex: 2; width: 100%;">
+        <div class="card"><h4>المحتوى التعليمي (المحور الثالث)</h4><div id="lessonsList" class="lessons"></div></div>
+        <div id="linksSection" class="card">
+          <h4>مصادر ومواقع إضافية</h4>
+          <div id="linksList" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+        </div>
+        <div id="chatSection" class="card hidden">
+          <h4>المساعد الذكي (Chatbot)</h4>
+          <div id="chatBox" class="chat"></div>
+          <div style="display:flex; gap:10px; margin-top:10px">
+            <input id="chatInput" style="margin:0" placeholder="اسأل المساعد..." />
+            <button class="btn" id="sendChat">إرسال</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="teacherPanel" class="card hidden" style="flex: 1; min-width: 280px; background:#f9f9f9">
+        <h4 id="panelTitle">إدارة المحتوى</h4>
+        <input type="hidden" id="editIndex" value="-1" />
+        <label>عنوان الدرس</label><input id="lessonTitle" />
+        <label>رابط يوتيوب</label><input id="lessonYT" />
+        <label>سؤال التقييم</label><textarea id="lessonQ"></textarea>
+        <label>الإجابة الصحيحة</label><input id="lessonA" />
+        <button class="btn" id="saveLesson" style="width:100%; margin-top:10px">حفظ الدرس</button>
+        <hr style="margin:20px 0; border:0; border-top:1px solid #eee">
+        <h4>إضافة روابط مستقلة</h4>
+        <label>اسم الموقع</label><input id="indName" />
+        <label>الرابط</label><input id="indUrl" />
+        <button class="btn" id="saveLink" style="width:100%; margin-top:10px; background:#059669">إضافة الرابط</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>جميع الحقوق محفوظة © Aya Mahmoud — Master Degree Researcher in Educational Technology</footer>
+
+<script>
+  const defaultLessons = [
+    { t: "الدرس الأول : التطبيقات التكنولوجية فى حياتنا", yt: "https://www.youtube.com/embed/u25K3glO8Tk", q: "هل الأدوات الرقمية تساعدنا على السفر ؟ نعم / لا", a: "نعم" },
+    { t: "الدرس الثانى : المواطنة الرقمية الحقوق و المسؤوليات", yt: "https://www.youtube.com/embed/XEPNItHB6xI", q: "أن تكون محمى من القرصنة من .... الرقمية : الحقوق / المسؤوليات", a: "الحقوق" },
+    { t: "الدرس الثالث : طرق التواصل عبر الإنترنت", yt: "https://www.youtube.com/embed/06oE8KlCVD4", q: "محادثات الفيديو تعد من نوع الإتصال : المتزامن / غير المتزامن", a: "المتزامن" },
+    { t: "الدرس الرابع : أدوات التواصل الرقمي", yt: "https://www.youtube.com/embed/a1FE0i_pjug", q: "ماذا يجب أن تفعل قبل الانضمام لمحادثة فيديو؟ 1. ارتداء ملابس مناسبة / 2. اللعب بصوت عالٍ", a: "1" },
+    { t: "الدرس الخامس : أدواتي في التعلم عبر الإنترنت", yt: "https://www.youtube.com/embed/c0aJJAMHuJo", q: "هل بنك المعرفة المصرى EKB من المصادر الموثوقة : نعم / لا", a: "نعم" },
+    { t: "الدرس السادس : مهارات البحث الرقمي", yt: "https://www.youtube.com/embed/AL4APMF_Hlo", q: "ما هي أول خطوة عند البحث؟ 1. كتابة النتائج / 2. اختيار الموضوع", a: "2" }
+  ];
+
+  const defaultLinks = [
+    { n: "بنك المعرفة المصري EKB", u: "https://www.ekb.eg" },
+    { n: "منصة المعمل الإفتراضى (Vlaby)", u: "https://vlaby.com/ar" },
+    { n: "مصمم الخرائط التفاعلى (NatGeo)", u: "https://mapmaker.nationalgeographic.org" }
+  ];
+
+  // منطق التحميل: إذا كانت الذاكرة فارغة أو تحتوي على مصفوفة فارغة، نحمل الدروس الافتراضية
+  let storedLessons = JSON.parse(localStorage.getItem('aya_lessons'));
+  let lessons = (storedLessons && storedLessons.length > 0) ? storedLessons : defaultLessons;
+  
+  let storedLinks = JSON.parse(localStorage.getItem('aya_links'));
+  let links = (storedLinks && storedLinks.length > 0) ? storedLinks : defaultLinks;
+
+  let userRole = null;
+
+  document.getElementById('loginBtn').onclick = () => {
+    let u = document.getElementById('username').value.trim();
+    let p = document.getElementById('password').value;
+    if(u === 'teacher' && p === 'teacher123') { userRole = 'teacher'; startApp(); }
+    else if (u === 'student' && p === 'student123') { userRole = 'student'; startApp(); }
+    else { alert("خطأ في اسم المستخدم أو كلمة المرور!"); }
+  };
+
+  function startApp() {
+      document.getElementById('loginCard').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      if(userRole === 'teacher') {
+          document.getElementById('teacherPanel').classList.remove('hidden');
+          document.getElementById('chatSection').classList.add('hidden');
+      } else {
+          document.getElementById('teacherPanel').classList.add('hidden');
+          document.getElementById('chatSection').classList.remove('hidden');
+      }
+      render(); renderLinks();
+  }
+
+  function render() {
+    let d = document.getElementById('lessonsList');
+    d.innerHTML = "";
+    lessons.forEach((l, i) => {
+      d.innerHTML += `
+        <div class="lesson card">
+          <h4>${l.t}</h4>
+          ${l.yt ? `<div class="video-container"><iframe src="${l.yt}" allowfullscreen></iframe></div>` : ''}
+          <p style="font-size:14px"><b>التقييم:</b> ${l.q}</p>
+          <button class="btn" onclick="checkAns(${i})" style="width:100%">إرسال الإجابة</button>
+          ${userRole === 'teacher' ? `<div style="display:flex; gap:5px; margin-top:10px"><button class="btn edit-btn" onclick="editL(${i})" style="flex:1">تعديل</button><button class="btn danger" onclick="delL(${i})" style="flex:1">حذف</button></div>` : ''}
+        </div>`;
+    });
+    // حفظ في الذاكرة لضمان الاستمرارية
+    localStorage.setItem('aya_lessons', JSON.stringify(lessons));
+  }
+
+  function renderLinks() {
+    let d = document.getElementById('linksList');
+    d.innerHTML = "";
+    links.forEach((link, i) => {
+      d.innerHTML += `<div style="display:flex; gap:5px"><a href="${link.u}" target="_blank" class="btn link-btn">🔗 ${link.n}</a>
+      ${userRole === 'teacher' ? `<button class="btn danger" style="padding:5px; margin-top:10px" onclick="delLink(${i})">×</button>` : ''}</div>`;
+    });
+    localStorage.setItem('aya_links', JSON.stringify(links));
+  }
+
+  window.checkAns = (i) => {
+    let ans = prompt("اكتب إجابتك:");
+    if(ans && ans.trim().toLowerCase() === lessons[i].a.trim().toLowerCase()) alert("ممتاز! إجابة صحيحة."); 
+    else alert("حاول مرة أخرى!");
+  };
+
+  document.getElementById('saveLesson').onclick = () => {
+    let t = document.getElementById('lessonTitle').value;
+    let editIdx = parseInt(document.getElementById('editIndex').value);
+    if(!t) return alert("أدخل العنوان");
+    let obj = { t, yt: document.getElementById('lessonYT').value, q: document.getElementById('lessonQ').value, a: document.getElementById('lessonA').value };
+    if(editIdx === -1) lessons.push(obj); else lessons[editIdx] = obj;
+    render(); clearForm();
+  };
+
+  document.getElementById('saveLink').onclick = () => {
+    let n = document.getElementById('indName').value;
+    let u = document.getElementById('indUrl').value;
+    if(n && u) { links.push({n, u}); renderLinks(); }
+    document.getElementById('indName').value = ""; document.getElementById('indUrl').value = "";
+  };
+
+  window.editL = (i) => {
+    let l = lessons[i];
+    document.getElementById('lessonTitle').value = l.t;
+    document.getElementById('lessonYT').value = l.yt;
+    document.getElementById('lessonQ').value = l.q;
+    document.getElementById('lessonA').value = l.a;
+    document.getElementById('editIndex').value = i;
+    document.getElementById('panelTitle').innerText = "تعديل الدرس";
+    window.scrollTo(0,0);
+  };
+
+  window.delL = (i) => { if(confirm("حذف؟")){lessons.splice(i,1); render();}};
+  window.delLink = (i) => { if(confirm("حذف؟")){links.splice(i,1); renderLinks();}};
+
+  function clearForm() {
+    document.getElementById('lessonTitle').value = ""; document.getElementById('lessonYT').value = "";
+    document.getElementById('lessonQ').value = ""; document.getElementById('lessonA').value = "";
+    document.getElementById('editIndex').value = "-1";
+    document.getElementById('panelTitle').innerText = "إدارة المحتوى";
+  }
+
+  document.getElementById('logoutBtn').onclick = () => location.reload();
+
+  document.getElementById('sendChat').onclick = () => {
+    let inp = document.getElementById('chatInput'); let box = document.getElementById('chatBox');
+    let txt = inp.value.trim(); if(!txt) return;
+    box.innerHTML += `<div class="message from-user">${txt}</div>`;
+    let res = "مرحباً بك! أنا مساعدك الذكي. يمكنك سؤالي عن المحور الثالث.";
+    if (txt.includes("اتصال")) res = "الاتصال المتزامن (مثل فيديو كول) يحدث في نفس الوقت، وغير المتزامن (مثل الإيميل) لا يتطلب رداً فورياً.";
+    else if (txt.includes("بحث")) res = "خطوات البحث الذكي تبدأ باختيار موضوع محدد ثم اختيار مصادر موثوقة مثل بنك المعرفة.";
+    else if (txt.includes("حقوق")) res = "من حقوقك الرقمية الحماية من القرصنة والخصوصية.";
+    setTimeout(() => { box.innerHTML += `<div class="message from-bot">${res}</div>`; box.scrollTop = box.scrollHeight; }, 400);
+    inp.value = "";
+  };
+</script>
+</body>
+</html>
